@@ -26,18 +26,23 @@ class CustomAutoSchema(SwaggerAutoSchema):
 
         responses = self.get_responses()
 
-        languages = [
-            'Bash',
-            'Python',
-        ]
-
         parameters_dict = {}
-        parameter_names = list(map(lambda parameter: parameter.name, self.get_request_form_parameters(self.get_view_serializer())))
+
         if 'exmaple_paramters' in self.overrides:
+            parameter_names = list(
+                map(
+                    lambda parameter: parameter.name,
+                    self.get_request_form_parameters(self.get_view_serializer()),
+                )
+            )
             for parameter_name in parameter_names:
                 if parameter_name in self.overrides['exmaple_paramters']:
                     parameters_dict[parameter_name] = self.overrides['exmaple_paramters'][parameter_name]
 
+        languages = [
+            'Bash',
+            'Python',
+        ]
         code_samples = []
         for language in languages:
             generator = getattr(self, f'generate_{language.lower()}_code', None)
@@ -69,8 +74,8 @@ class CustomAutoSchema(SwaggerAutoSchema):
 
     @staticmethod
     def generate_bash_code(method, content_type, url, parameters):
-        return f'''curl --location '{url}' \\
-     --header 'Content-Type: f{content_type}' \\
+        return f'''curl -X {method} --location '{url}' \\
+     --header 'Content-Type: {content_type}' \\
      --header 'Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9xxxx' \\
      --data '{json.dumps(parameters, indent=4)}\''''
 
