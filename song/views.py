@@ -5,6 +5,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework.permissions import IsAdminUser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.throttling import AnonRateThrottle
+from rest_framework.throttling import UserRateThrottle
 from rest_framework import status
 from .serializers import SignUpSerializer
 from .serializers import ChangePasswordSerializer
@@ -67,6 +69,10 @@ class UpdateProfileView(generics.GenericAPIView):
         IsAuthenticated,
     )
     serializer_class = UpdateProfileSerializer
+    throttle_classes = [
+        AnonRateThrottle,
+        UserRateThrottle,
+    ]
 
     def post(self, request, format=None):
         serializer = self.get_serializer(data=request.data)
