@@ -15,8 +15,11 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.urls import include
 from django.urls import path
 
+from debug_toolbar.toolbar import debug_toolbar_urls
+from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework_simplejwt.views import TokenVerifyView
@@ -30,6 +33,7 @@ from song.views import UpdateProfileView
 from song.views import AdminChangePasswordView
 from song.views import AdminUpdateProfileView
 from song.views import SignUpView
+from song.viewsets import ArtistViewSet
 
 schema_view = get_schema_view(
    openapi.Info(
@@ -44,7 +48,11 @@ schema_view = get_schema_view(
    permission_classes=(permissions.AllowAny,),
 )
 
+router = DefaultRouter()
+router.register(r'artists', ArtistViewSet, basename='artist')
+
 urlpatterns = [
+    path('', include(router.urls)),
     path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
@@ -57,4 +65,4 @@ urlpatterns = [
     path('api/update_profile/', UpdateProfileView.as_view(), name='update_profile'),
     path('api/admin/change_password/<int:pk>/', AdminChangePasswordView.as_view(), name='auth_admin_change_password'),
     path('api/admin/update_profile/<int:pk>/', AdminUpdateProfileView.as_view(), name='admin_update_profile'),
-]
+] + debug_toolbar_urls()
