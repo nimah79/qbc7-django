@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'drf_yasg',
     'rest_framework',
+    'debug_toolbar',
     'rest_framework_simplejwt',
     'song',
 ]
@@ -64,16 +65,28 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:8001',
 ]
 
+INTERNAL_IPS = [
+    '127.0.0.1',
+]
+
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    ),
+    'DEFAULT_PAGINATION_CLASS': 'song.pagination.IdBasedCursorPagination',
+    'PAGE_SIZE': 10,
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '5/minute',
+        'user': '10/minute',
+    },
 }
 
 ROOT_URLCONF = 'spotify.urls'
@@ -93,6 +106,13 @@ TEMPLATES = [
         },
     },
 ]
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "cache",
+    }
+}
 
 WSGI_APPLICATION = 'spotify.wsgi.application'
 
